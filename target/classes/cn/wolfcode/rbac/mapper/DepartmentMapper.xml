@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<!--Mybatis框架-->
+<mapper namespace="cn.wolfcode.rbac.mapper.DepartmentMapper">
+    <resultMap id="BaseResultMap" type="cn.wolfcode.rbac.domain.Department">
+        <id property="id" column="id"/>
+        <result property="name" column="name"/>
+        <result property="sn" column="sn"/>
+    </resultMap>
+
+    <select id="selectAll" resultMap="BaseResultMap">
+        select * from department;
+    </select>
+
+    <delete id="deleteById">
+        delete from department where id = #{id};
+    </delete>
+
+    <insert id="saceDepartment" useGeneratedKeys="true" keyProperty="id">
+        insert into department(name ,sn) value (#{name},#{sn});
+    </insert>
+
+    <update id="updateByid" >
+        update department set name = #{name},sn=#{sn} where id=#{id};
+    </update>
+
+    <select id="getById" resultMap="BaseResultMap">
+        select * from department where id = #{id};
+    </select>
+    <select id="queryForCount" resultType="java.lang.Integer">
+        select count(*) from department;
+    </select>
+    <select id="queryForData" resultType="cn.wolfcode.rbac.domain.Department">
+        select * from department
+        limit #{startIndex},#{pageSize};
+    </select>
+
+</mapper>
+

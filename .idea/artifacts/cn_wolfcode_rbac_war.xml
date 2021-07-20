@@ -1,0 +1,14 @@
+<component name="ArtifactManager">
+  <artifact type="war" name="cn.wolfcode.rbac:war">
+    <output-path>$PROJECT_DIR$/target</output-path>
+    <properties id="maven-jee-properties">
+      <options>
+        <module>cn.wolfcode.rbac</module>
+        <packaging>war</packaging>
+      </options>
+    </properties>
+    <root id="archive" name="cn.wolfcode.rbac-1.0.0.war">
+      <element id="artifact" artifact-name="cn.wolfcode.rbac:war exploded" />
+    </root>
+  </artifact>
+</component>

@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+
+<mapper namespace="cn.wolfcode.rbac.mapper.EmployeeMapper">
+    <resultMap id="BaseResultMap" type="cn.wolfcode.rbac.domain.Employee">
+        <id property="id" column="id"/>
+        <result property="name" column="name"/>
+        <result property="password" column="password"/>
+        <result property="email" column="email"/>
+        <result property="age" column="age"/>
+        <result property="admin" column="admin"/>
+<!--        <result property="deptId" column="dept_id"/>-->
+        <association property="dept"
+                     javaType="cn.wolfcode.rbac.domain.Department">
+            <id property="id" column="d_id"/>
+            <result property="name" column="d_name"/>
+        </association>
+<!--        封装集合类型的数据，因为用的是List集合
+            property：封装到类的哪一个属性上去roles
+            ofType：集合中的元素类型（Role）
+            column:根据那个列查询对应的角色信息
+            select：选择一条sql
+-->
+        <collection property="roles" ofType="cn.wolfcode.rbac.domain.Role" column="id"
+                    select="cn.wolfcode.rbac.mapper.RoleMapper.selectRolesByEmpId"/>
+<!--        <result property="dept" column="dept"/>-->
+    </resultMap>
+<!--查询-->
+    <select id="selectAll" resultMap="BaseResultMap" >
+--         select employee.id,employee.name,employee.email,employee.age,employee.dept_id,department.name as dept
+--         from employee,department
+--         where employee.dept_id=department.id;
+            select e.id,e.name,e.`password`,e.email,e.age,e.admin,e.dept_id,
+            d.id as d_id,d.name as d_name,d.sn
+            from employee e left join department d
+            on e.dept_id=d.id
+            <where>
+                <if test="keyword != null and keyword != ''">
+                    and (e.name like concat('%',#{keyword},'%')
+                    or e.email like concat('%',#{keyword},'%'))
+                </if>
+                <if test="deptId != -1">
+                    and e.dept_id = #{deptId};
+                </if>
+            </where>
+
+--             inner join:两个表为基础，有关联的数据才查出来       left join：以左边表为基础   right ：以右边表为基础
+    </select>
+<!--删除-->
+    <delete id="deleteById">
+        delete from employee where id = #{id};
+    </delete>
+
+    <delete id="deleteEmpAndRelation">
+        delete from employee_role where employee_id = #{id};
+    </delete>
+
+    <!--添加-->
+    <insert id="saceEmployee" useGeneratedKeys="true" keyProperty="id">
+        insert into employee(name,password,email,age,admin,dept_id)
+        value (#{name},#{password},#{email},#{age},#{admin},#{dept.id});
+    </insert>
+    <insert id="saceEmpAndRolesRelation">
+        insert into employee_role(employee_id,role_id) value (#{empId},#{roleId});
+    </insert>
+    <!--修改-->
+    <update id="updateById" >
+        update employee set name = #{name},email=#{email},age=#{age},admin=#{admin},dept_id=#{dept.id} where id=#{id};
+    </update>
+
+    <select id="getById" resultMap="BaseResultMap">
+        select e.id,e.name,e.`password`,e.email,e.age,e.admin,e.dept_id,
+            d.id as d_id,d.name as d_name,d.sn
+            from employee e left join department d
+            on e.dept_id=d.id where e.id=#{id};
+    </select>
+    <select id="queryForCount" resultType="java.lang.Integer">
+        select count(*) from employee e
+        <where>
+            <if test="keyword != null and keyword != ''">
+                and (e.name like concat('%',#{keyword},'%')
+                or e.email like concat('%',#{keyword},'%'))
+            </if>
+            <if test="deptId != -1">
+                and e.dept_id = #{deptId}
+            </if>
+        </where>
+    </select>
+    <select id="queryForData" resultMap="BaseResultMap" >
+        select e.id,e.name,e.`password`,e.email,e.age,e.admin,e.dept_id,
+        d.id as d_id,d.name as d_name,d.sn
+        from employee e left join department d
+        on e.dept_id=d.id
+        <where>
+            <if test="keyword != null and keyword != ''">
+                and (e.name like concat('%',#{keyword},'%')
+                or e.email like concat('%',#{keyword},'%'))
+            </if>
+            <if test="deptId != -1">
+                and e.dept_id = #{deptId}
+            </if>
+        </where>
+        limit #{startIndex},#{pageSize};
+    </select>
+    <select id="queryLogin" resultType="cn.wolfcode.rbac.domain.Employee">
+        select *from employee
+        where name = #{name} and password = #{password};
+    </select>
+
+</mapper>

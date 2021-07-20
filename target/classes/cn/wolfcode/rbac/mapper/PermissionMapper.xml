@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="cn.wolfcode.rbac.mapper.PermissionMapper">
+    <resultMap id="BaseResultMap" type="cn.wolfcode.rbac.domain.Permission">
+        <id property="id" column="id"/>
+        <result property="name" column="name"/>
+        <result property="expression" column="expression"/>
+    </resultMap>
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        insert into permission(name,expression) values (#{name},#{expression})
+    </insert>
+
+    <select id="selectAll" resultMap="BaseResultMap">
+        select * from permission;
+    </select>
+
+    <delete id="deleteById">
+        delete from department where id = #{id};
+    </delete>
+    <delete id="deleteAll">
+        delete from permission;
+    </delete>
+
+    <select id="selectPermissionsByRoleId" resultMap="BaseResultMap">
+        select * from permission p
+        left join role_permission rp
+        on p.id = rp.permission_id
+        where rp.role_id=#{id};
+    </select>
+    <select id="queryForCount" resultType="java.lang.Integer">
+        select count(*) from permission;
+    </select>
+    <select id="queryForData" resultType="cn.wolfcode.rbac.domain.Permission">
+        select * from permission
+        limit #{startIndex},#{pageSize};
+    </select>
+    <select id="selectExpressionsByEmpId" resultType="java.lang.String">
+        select p.expression from permission p
+        left join role_permission rp on p.id=rp.permission_id
+        left join employee_role er on rp.role_id = er.role_id
+        where er.employee_id = #{id}
+    </select>
+</mapper>

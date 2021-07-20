@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<!--Mybatis框架-->
+<mapper namespace="cn.wolfcode.rbac.mapper.RoleMapper">
+    <resultMap id="BaseResultMap" type="cn.wolfcode.rbac.domain.Role">
+        <id property="id" column="id"/>
+        <result property="name" column="name"/>
+        <result property="sn" column="sn"/>
+        <collection property="permissions" ofType="cn.wolfcode.rbac.domain.Permission" column="id"
+                    select="cn.wolfcode.rbac.mapper.PermissionMapper.selectPermissionsByRoleId"/>
+    </resultMap>
+
+    <select id="selectAll" resultMap="BaseResultMap">
+        select * from role;
+    </select>
+
+    <delete id="deleteById">
+        delete from role where id = #{id};
+    </delete>
+    <delete id="deleteRoleAndPermissionRelation">
+        delete from role_permission where role_id = #{id};
+    </delete>
+
+    <insert id="saceRole" useGeneratedKeys="true" keyProperty="id">
+        insert into role(name ,sn) value (#{name},#{sn});
+    </insert>
+    <insert id="saceRoleAndPermissionRelation">
+        insert into role_permission(role_id,permission_id) value (#{id},#{permissionId});
+    </insert>
+
+    <update id="updateById" >
+        update role set name = #{name},sn=#{sn} where id=#{id};
+    </update>
+
+    <select id="getById" resultMap="BaseResultMap">
+        select distinct * from role where id = #{id};
+    </select>
+    <select id="queryForCount" resultType="java.lang.Integer">
+        select count(*) from role;
+    </select>
+    <select id="queryForData" resultType="cn.wolfcode.rbac.domain.Role">
+        select * from role
+        limit #{startIndex},#{pageSize};
+    </select>
+    <select id="selectRolesByEmpId" resultMap="BaseResultMap">
+
+        select r.id,r.name,r.sn
+        from role as r left join employee_role as er
+        on r.id = er.role_id
+        where er.employee_id = #{id};
+    </select>
+</mapper>
+
